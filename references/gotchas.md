@@ -79,3 +79,29 @@ Not a JSON object, a JSON string. The tool handles serialization, but if you're 
 
 **22. The cloudId, spaceId, and pageId are all required and must be correct.**
 A wrong cloudId will give a 404. A wrong spaceId will create the page in the wrong space. Always confirm the values with the user.
+
+## Additional Gotchas (Node Types)
+
+**23. `expand` nodes cannot go inside table cells.**
+Confluence silently strips expand nodes from table cells. If you need collapsible content in a table, put the table inside the expand instead, or link to a child page with the details.
+
+**24. `layoutSection` cannot be nested inside another `layoutSection`.**
+You get one level of column layout per page section. If you need more complex layouts, use multiple `layoutSection` blocks stacked vertically, or use tables for grid layouts within a column.
+
+**25. `taskList` and `decisionList` need unique `localId` values.**
+Same rule as status lozenges. Without a unique localId, tasks and decisions may not render or may not be editable. Use meaningful prefixes like `"task-1"`, `"dec-1"`.
+
+**26. `codeBlock` can only contain plain text nodes.**
+No marks (bold, italic, colour, etc.) are allowed inside code blocks. If you add marks, they are silently stripped. The `language` attribute handles syntax highlighting automatically.
+
+**27. `mediaSingle` with external URLs needs the image to be publicly accessible.**
+If the image URL requires authentication or is behind a firewall, Confluence will show a broken image. Most Confluence images are uploaded attachments (type `"file"` with an attachment ID), not external URLs.
+
+**28. `date` timestamps are in milliseconds, not seconds.**
+Unix epoch multiplied by 1000. If you use seconds by mistake, the date will render as sometime in January 1970. A timestamp of `1719792000000` is correct for 1 July 2024. A timestamp of `1719792000` (without the last three zeros) would render as 20 January 1970.
+
+**29. `link` marks only work on `text` nodes.**
+You cannot make a status lozenge, emoji, or date into a clickable link. If you need a clickable status, put a linked text node next to the lozenge instead.
+
+**30. Nested lists require a `listItem` containing another list.**
+You cannot directly put a `bulletList` inside a `bulletList`. The correct nesting is: `bulletList` > `listItem` > (paragraph + `bulletList`). The paragraph with the parent item text comes first inside the listItem, then the nested list follows it.

@@ -77,6 +77,38 @@ The most critical building block is the **table header cell with brand colour**:
 
 Replace `#5a7554` with the user's brand colour if they've provided one.
 
+## All Available Building Blocks
+
+For full JSON snippets and examples of every building block, read `references/adf-building-blocks.md`. Here is the complete list:
+
+**Page structure:**
+- `heading` - Section titles (levels 2-6, level 1 is the page title)
+- `paragraph` - Regular text
+- `rule` - Horizontal divider between sections
+- `expand` - Collapsible section with a title (great for long pages)
+- `layoutSection` + `layoutColumn` - Multi-column layouts (2 or 3 columns)
+
+**Content blocks:**
+- `table` - Tables with branded header rows
+- `panel` - Coloured callout boxes (info, note, warning, error, tip, success)
+- `bulletList` + `orderedList` - Lists with nesting support
+- `codeBlock` - Syntax-highlighted code
+- `blockquote` - Quoted text
+- `mediaSingle` - Images
+
+**Interactive elements:**
+- `taskList` + `taskItem` - Checkable action items
+- `decisionList` + `decisionItem` - Recorded decisions
+
+**Inline elements** (go inside paragraphs):
+- `text` - Plain or formatted text (bold, italic, underline, strikethrough, coloured, code, links)
+- `status` - Coloured status lozenges
+- `emoji` - Emoji icons
+- `date` - Styled date pills
+- `mention` - @-mentions of users
+- `inlineCard` - Smart link previews (Jira issues, Confluence pages, URLs)
+- `hardBreak` - Line break within a paragraph
+
 ## Panel Types
 
 Use panels to highlight important information. Available types:
@@ -89,6 +121,26 @@ Use panels to highlight important information. Available types:
 | `error` | Red | Critical information, must-do items |
 | `tip` | Green | Helpful hints, positive callouts |
 | `success` | Green (lighter) | Confirmed items, achievements |
+
+## When to Use What
+
+Quick decision guide for choosing the right building block:
+
+| You want to... | Use this |
+|---|---|
+| Break up a long page | `expand` (collapse sections) + `rule` (dividers) |
+| Create a multi-column layout | `layoutSection` with `layoutColumn` |
+| Show action items with checkboxes | `taskList` with `taskItem` |
+| Record decisions | `decisionList` with `decisionItem` |
+| Show a status or category | `status` lozenge (coloured pill) |
+| Highlight important information | `panel` (info, warning, error, tip, success, note) |
+| Show code or commands | `codeBlock` with language attribute |
+| Link to a Jira issue or page | `inlineCard` with the URL |
+| Create a list | `bulletList` or `orderedList` |
+| Add a link to text | `link` mark on a text node |
+| Show a formatted date | `date` lozenge (timestamp in milliseconds) |
+| Mention a team member | `mention` with their account ID |
+| Embed an image | `mediaSingle` with `media` child |
 
 ## Status Lozenges
 
@@ -154,7 +206,7 @@ These were all discovered through trial and error. Read `references/gotchas.md` 
 7. **Tables with 4+ columns need `layout: "wide"`** or they'll be cramped.
 8. **Empty table cells need at least an empty paragraph node.**
 
-For the full list of 22 gotchas covering ADF structure, payload size, tables, content, PDF handling, and API quirks, read `references/gotchas.md`.
+For the full list of 30 gotchas covering ADF structure, payload size, tables, content, PDF handling, API quirks, and node type restrictions, read `references/gotchas.md`.
 
 ## Checklist Before Publishing
 
@@ -172,6 +224,10 @@ Before pushing any page to Confluence, verify:
 - Content is split into child pages if ADF exceeds ~30KB
 - Empty table cells have at least an empty paragraph node
 - `isNumberColumnEnabled: false` is set on every table
+- Expand sections have clear, descriptive titles
+- Task lists and decision lists have unique `localId` values
+- Code blocks use appropriate language attribute for syntax highlighting
+- Column layout widths add up to 100
 
 ## After Publishing
 

@@ -161,6 +161,188 @@ function doc(...content) {
   };
 }
 
+/**
+ * Create an expand/collapse section
+ */
+function expand(title, ...content) {
+  return { type: "expand", attrs: { title }, content };
+}
+
+/**
+ * Create a bullet list from items
+ * Each item can be a string (wrapped automatically) or an array of ADF nodes
+ */
+function ul(...items) {
+  return {
+    type: "bulletList",
+    content: items.map(item => li(item))
+  };
+}
+
+/**
+ * Create an ordered list from items
+ */
+function ol(...items) {
+  return {
+    type: "orderedList",
+    attrs: { order: 1 },
+    content: items.map(item => li(item))
+  };
+}
+
+/**
+ * Create a list item
+ * Accepts a string (plain text) or an array of ADF block nodes
+ */
+function li(content) {
+  return {
+    type: "listItem",
+    content: typeof content === "string"
+      ? [{ type: "paragraph", content: [{ type: "text", text: content }] }]
+      : Array.isArray(content) ? content : [content]
+  };
+}
+
+/**
+ * Create a task list
+ */
+function taskList(localId, ...items) {
+  return { type: "taskList", attrs: { localId }, content: items };
+}
+
+/**
+ * Create a task item
+ * state: "TODO" or "DONE"
+ */
+function taskItem(localId, text, state = "TODO") {
+  return {
+    type: "taskItem",
+    attrs: { localId, state },
+    content: [{ type: "text", text }]
+  };
+}
+
+/**
+ * Create a decision list
+ */
+function decisionList(localId, ...items) {
+  return { type: "decisionList", attrs: { localId }, content: items };
+}
+
+/**
+ * Create a decision item
+ */
+function decisionItem(localId, text, state = "DECIDED") {
+  return {
+    type: "decisionItem",
+    attrs: { localId, state },
+    content: [{ type: "text", text }]
+  };
+}
+
+/**
+ * Create a code block
+ * language: "python", "javascript", "bash", "json", "sql", etc.
+ */
+function codeBlock(text, language = "") {
+  return {
+    type: "codeBlock",
+    attrs: { language },
+    content: [{ type: "text", text }]
+  };
+}
+
+/**
+ * Create a linked text node (inline, use inside a paragraph's content array)
+ */
+function link(text, href) {
+  return {
+    type: "text", text,
+    marks: [{ type: "link", attrs: { href } }]
+  };
+}
+
+/**
+ * Create an emoji (inline, use inside a paragraph's content array)
+ */
+function emoji(shortName, id, text) {
+  return { type: "emoji", attrs: { shortName, id, text } };
+}
+
+/**
+ * Create a date lozenge (inline, use inside a paragraph's content array)
+ * timestamp in milliseconds (Unix epoch * 1000)
+ */
+function dateLozenge(timestamp) {
+  return { type: "date", attrs: { timestamp: String(timestamp) } };
+}
+
+/**
+ * Create a mention (inline, use inside a paragraph's content array)
+ */
+function mention(id, displayName) {
+  return { type: "mention", attrs: { id, text: "@" + displayName, accessLevel: "" } };
+}
+
+/**
+ * Create an external image
+ * layout: "center", "wide", "full-width", "wrap-left", "wrap-right"
+ */
+function media(url, layout = "center") {
+  return {
+    type: "mediaSingle",
+    attrs: { layout },
+    content: [{
+      type: "media",
+      attrs: { type: "external", url }
+    }]
+  };
+}
+
+/**
+ * Create a column layout section
+ * Pass layoutColumn() calls as arguments
+ */
+function layoutSection(...columns) {
+  return { type: "layoutSection", content: columns };
+}
+
+/**
+ * Create a layout column with a width percentage
+ * Common widths: 50 (half), 33.33 (third), 66.66 (two-thirds)
+ */
+function layoutColumn(width, ...content) {
+  return { type: "layoutColumn", attrs: { width }, content };
+}
+
+/**
+ * Create underlined text (inline, use inside a paragraph's content array)
+ */
+function underline(text) {
+  return { type: "text", text, marks: [{ type: "underline" }] };
+}
+
+/**
+ * Create strikethrough text (inline, use inside a paragraph's content array)
+ */
+function strike(text) {
+  return { type: "text", text, marks: [{ type: "strike" }] };
+}
+
+/**
+ * Create inline code text (inline, use inside a paragraph's content array)
+ */
+function inlineCode(text) {
+  return { type: "text", text, marks: [{ type: "code" }] };
+}
+
+/**
+ * Create a hard break (line break within a paragraph)
+ */
+function hardBreak() {
+  return { type: "hardBreak" };
+}
+
 // ============================================================
 // Example usage - modify this to build your document
 // ============================================================
@@ -180,17 +362,31 @@ const myDoc = doc(
       td("Phase 2 In Progress"),
       td("30 Mar 2026"),
       td([{ type: "paragraph", content: [status("IN PROGRESS", "blue")] }])
-    ),
-    tr(
-      td("Phase 3 Planning"),
-      td("TBD"),
-      td([{ type: "paragraph", content: [status("NOT STARTED", "yellow")] }])
     )
   ),
   rule(),
-  h2("Notes"),
-  panelWithTitle("warning", "Deadline", "Phase 2 must be completed before the end of Q1."),
-  p("Contact the project lead for any questions about timelines.")
+  h2("Key Links"),
+  ul("Project charter", "Technical design doc", "Test plan"),
+  rule(),
+  h2("Detailed Notes"),
+  expand("Click to see implementation details",
+    p("The migration will happen in three phases."),
+    ol("Database migration", "API switchover", "Frontend deployment"),
+    codeBlock("npm run migrate --env production", "bash")
+  ),
+  rule(),
+  h2("Action Items"),
+  taskList("demo-tasks",
+    taskItem("t1", "Review the migration plan"),
+    taskItem("t2", "Update the runbook", "DONE")
+  ),
+  rule(),
+  h2("Decisions"),
+  decisionList("demo-decisions",
+    decisionItem("d1", "We will use PostgreSQL instead of MySQL")
+  ),
+  rule(),
+  panelWithTitle("warning", "Deadline", "Phase 2 must be completed before the end of Q1.")
 );
 
 // Output the ADF JSON
