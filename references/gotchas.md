@@ -105,3 +105,6 @@ You cannot make a status lozenge, emoji, or date into a clickable link. If you n
 
 **30. Nested lists require a `listItem` containing another list.**
 You cannot directly put a `bulletList` inside a `bulletList`. The correct nesting is: `bulletList` > `listItem` > (paragraph + `bulletList`). The paragraph with the parent item text comes first inside the listItem, then the nested list follows it.
+
+**31. NEVER truncate content to fit the ADF size limit.**
+If you have 64 items to display and your page only fits 8, create 8 child pages with 8 items each. Do NOT show 8 items and add a note saying "full dataset available elsewhere". The whole point of creating the page is to show ALL the content. Truncating defeats the purpose and makes the page useless. Each requirement table with status lozenges and verbatim text is roughly 2.5-3KB of ADF, so plan for ~8-10 per child page.

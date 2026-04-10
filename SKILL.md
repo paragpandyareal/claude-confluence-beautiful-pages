@@ -27,7 +27,7 @@ If the user has provided these details previously in the conversation or in thei
 5. **Use status lozenges** instead of plain text for statuses, responses, and categories.
 6. **Use dividers (`{"type": "rule"}`)** between major sections to give the page breathing room.
 7. **Never let a page be just walls of tables**. Break them up with headings, panels, and dividers.
-8. **Split large pages into child pages** if the ADF exceeds ~30KB. Confluence Cloud has practical limits on update payload size.
+8. **NEVER truncate content to fit one page.** If ADF exceeds ~25KB, split into parent + child pages. See "Handling Large Content" section below. Dropping content is worse than having multiple pages.
 
 ## Quick Reference - ADF Document Structure
 
@@ -150,9 +150,36 @@ Available colours: `green`, `yellow`, `red`, `blue`, `purple`
 
 Every status lozenge needs a unique `localId` and the `style` attribute must be an empty string `""`.
 
+## Handling Large Content (CRITICAL)
+
+**NEVER drop, truncate, or reduce content to fit the 30KB ADF limit.** If the content exceeds ~25KB of ADF, you MUST split it across multiple pages. Cutting content to fit one page defeats the purpose of the page.
+
+**How to split large content into parent + child pages:**
+
+1. **Create a parent hub page first.** This page contains:
+   - An info panel with a summary of the full content
+   - A summary table or overview section
+   - Navigation pointers to the child pages (Confluence automatically shows child pages below the parent, so explicit links are optional)
+
+2. **Create child pages for the detail.** Each child page:
+   - Must be created with `parentId` set to the hub page's ID (returned from creating the hub page)
+   - Should stay under 25KB of ADF (leave buffer below the 30KB limit)
+   - Gets its own info panel at the top explaining what this section covers
+   - Titles should make it clear which section this is (e.g., "Chapter 2 Part 1 - Requirements REQ-001 to REQ-010")
+
+3. **Estimate ADF size before building.** Each requirement or data row with status lozenges, verbatim text, and a 6-row branded table is roughly 2.5-3KB of ADF. So a 25KB page fits roughly 8-10 detailed requirement tables. Plan your splits accordingly.
+
+4. **ALL content must appear on one of the pages.** After creating all pages, verify that every item from the source data appears on exactly one child page. If the source has 64 items and your pages only show 8, you have a bug.
+
+**Example split for 64 requirements across 4 chapters:**
+- Hub page: summary, counts, coverage map
+- Child page 1: Chapter 2 Part 1 (REQ-001 to REQ-008)
+- Child page 2: Chapter 2 Part 2 (REQ-009 to REQ-016)
+- ... and so on until all 64 requirements have a page
+
 ## Page Templates
 
-For ready-to-use page templates (requirements validation, hub pages, reference pages, input/questions pages), read `references/page-templates.md`.
+For ready-to-use page templates (requirements validation, hub pages, reference pages, input/questions pages, meeting notes, runbooks, release notes, architecture docs, retrospectives), read `references/page-templates.md`.
 
 ## JavaScript Helpers
 
@@ -206,7 +233,7 @@ These were all discovered through trial and error. Read `references/gotchas.md` 
 7. **Tables with 4+ columns need `layout: "wide"`** or they'll be cramped.
 8. **Empty table cells need at least an empty paragraph node.**
 
-For the full list of 30 gotchas covering ADF structure, payload size, tables, content, PDF handling, API quirks, and node type restrictions, read `references/gotchas.md`.
+For the full list of 31 gotchas covering ADF structure, payload size, tables, content, PDF handling, API quirks, and node type restrictions, read `references/gotchas.md`.
 
 ## Checklist Before Publishing
 
@@ -221,7 +248,7 @@ Before pushing any page to Confluence, verify:
 - No unnecessary `colspan`/`rowspan` in table cell attrs
 - ADF JSON is valid (no trailing commas, proper nesting)
 - Page title is set via the `title` parameter, not as H1 in body
-- Content is split into child pages if ADF exceeds ~30KB
+- Content is split into child pages if ADF exceeds ~25KB (NEVER truncate content to fit)
 - Empty table cells have at least an empty paragraph node
 - `isNumberColumnEnabled: false` is set on every table
 - Expand sections have clear, descriptive titles
